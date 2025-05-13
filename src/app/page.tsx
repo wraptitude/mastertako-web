@@ -367,7 +367,7 @@ export default function Home() {
   }, [])
   
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-blue-900 to-blue-500 overflow-x-hidden">
+    <div className="w-full min-h-screen bg-gradient-to-b from-orange-900 to-orange-700 overflow-x-hidden">
       {/* Background pattern */}
       <JapanesePattern />
       
@@ -385,7 +385,7 @@ export default function Home() {
       >
         {/* Traditional Japanese wave pattern at bottom */}
         <div className="absolute bottom-0 left-0 w-full h-16 z-10 pointer-events-none">
-          <svg preserveAspectRatio="none" viewBox="0 0 1200 120" className="w-full h-full text-blue-600 fill-current opacity-70">
+          <svg preserveAspectRatio="none" viewBox="0 0 1200 120" className="w-full h-full text-orange-600 fill-current opacity-70">
             <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z">
             </path>
           </svg>
@@ -420,7 +420,7 @@ export default function Home() {
             >
               <planeGeometry args={[100, 100]} />
               <meshStandardMaterial 
-                color="#1e3a8a" 
+                color="#8B2500" 
                 metalness={0.2}
                 roughness={0.8}
               />
@@ -572,7 +572,7 @@ export default function Home() {
       </div>
       
       {/* Footer with Japanese pattern */}
-      <div className="bg-blue-900 py-6 text-white">
+      <div className="bg-orange-900 py-6 text-white">
         <div className="container mx-auto px-4 text-center text-sm">
           <p>© 2024 マスタータコ - Markham&apos;s 本格的なたこ焼き</p>
         </div>
