@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Master Tako | Authentic Takoyaki in Markham",
-  description: "Experience the most authentic takoyaki in Markham. Our octopus balls are made with fresh ingredients and traditional Japanese recipes.",
+  title: "マスタータコ | 本格的なたこ焼き - マーカム",
+  description: "マーカムで最も本格的なたこ焼きを体験してください。新鮮な材料と伝統的な日本のレシピで作られています。",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
