@@ -139,7 +139,7 @@ export default function MenuPage() {
         transition={{ 
           duration: 0.6, 
           delay: index * 0.04,
-          ease: [0.6, 0.01, -0.05, 0.95]
+          ease: [0.6, 0.01, 0.05, 0.95]
         }}
       >
         {letter === ' ' ? '\u00A0' : letter}

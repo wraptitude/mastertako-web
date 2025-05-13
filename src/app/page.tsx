@@ -8,6 +8,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 // Dynamically import the Player component with SSR disabled
 const Player = dynamic(
@@ -220,6 +221,30 @@ function JapaneseLantern({ position }: { position: 'left' | 'right' }) {
   )
 }
 
+// Navigation Component
+function Navigation() {
+  return (
+    <div className="fixed top-0 right-0 z-50 p-4">
+      <div className="flex space-x-2">
+        <Link 
+          href="/menu" 
+          className="japanese-button px-4 py-2 rounded-md font-bold flex items-center"
+        >
+          <span className="mr-1">メニュー</span>
+          <span className="text-xs opacity-80">Menu</span>
+        </Link>
+        <Link 
+          href="/about" 
+          className="japanese-button px-4 py-2 rounded-md font-bold flex items-center"
+        >
+          <span className="mr-1">紹介</span>
+          <span className="text-xs opacity-80">About</span>
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 // Menu Item Component for the scrolling section
 interface MenuItemProps {
   name: string;
@@ -346,6 +371,9 @@ export default function Home() {
       {/* Background pattern */}
       <JapanesePattern />
       
+      {/* Navigation */}
+      <Navigation />
+      
       {/* Decorative lanterns */}
       <JapaneseLantern position="left" />
       <JapaneseLantern position="right" />
@@ -467,6 +495,19 @@ export default function Home() {
             />
           ))}
         </div>
+        
+        <div className="mt-12 text-center">
+          <Link 
+            href="/menu"
+            className="japanese-button px-8 py-3 rounded-md font-bold text-lg inline-flex items-center"
+          >
+            <span className="mr-2">完全なメニューを見る</span>
+            <span className="text-sm">See Full Menu</span>
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </Link>
+        </div>
       </div>
       
       {/* Contact section */}
@@ -500,6 +541,19 @@ export default function Home() {
                 </svg>
                 @mastertako.markham
               </a>
+              
+              <div className="mt-8">
+                <Link 
+                  href="/about"
+                  className="japanese-button px-6 py-2 rounded-md font-bold inline-flex items-center"
+                >
+                  <span className="mr-2">私たちについて</span>
+                  <span className="text-sm">Learn About Us</span>
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
             </div>
             
             <div className="w-full md:w-1/2 max-w-md flex justify-center">
