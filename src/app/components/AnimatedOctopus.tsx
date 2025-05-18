@@ -34,7 +34,7 @@ export default function AnimatedOctopus({
   const positions = {
     left: { x: '25%', y: '55%' },
     center: { x: '50%', y: '50%' },
-    right: { x: '75%', y: '55%' },
+    right: { x: '75%', y: '-200%' },
   }
   
   useEffect(() => {
@@ -92,20 +92,21 @@ export default function AnimatedOctopus({
   return (
     <div 
       ref={containerRef}
-      className="absolute pointer-events-none octopus-container float-character octopus-glow japanese-bold-border"
+      // className="absolute pointer-events-none octopus-container float-character octopus-glow japanese-bold-border"
+      className="absolute"
       style={{ 
         width: dimensions[size].width, 
         height: dimensions[size].height,
         zIndex: 50, // Higher z-index to ensure visibility against the ocean background
-        filter: 'drop-shadow(0 0 30px rgba(255,0,0,0.7)) saturate(2) contrast(1.8)' // Stronger red glow and enhanced colors
+        // filter: 'drop-shadow(0 0 30px rgba(255,0,0,0.7)) saturate(2) contrast(1.8)' // Stronger red glow and enhanced colors
       }}
     >
       {/* Red backdrop for stronger color effect */}
-      <div className="absolute inset-0 bg-red-700 rounded-full opacity-50 animate-pulse" 
-        style={{ animationDuration: '2.5s' }}></div>
+      {/* <div className="absolute inset-0 bg-red-700 rounded-full opacity-50 animate-pulse" 
+        style={{ animationDuration: '2.5s' }}></div> */}
       
       {/* Strong black outline for traditional Japanese ukiyo-e style */}
-      <div className="absolute inset-2 rounded-full border-[12px] border-black opacity-80"></div>
+      {/* <div className="absolute inset-2 rounded-full border-[12px] border-black opacity-80"></div> */}
       
       {/* White highlights to improve contrast */}
       <div className="absolute top-[10%] left-[10%] w-[20%] h-[20%] rounded-full bg-white opacity-30 blur-sm"></div>
@@ -113,16 +114,16 @@ export default function AnimatedOctopus({
       <Player
         autoplay
         loop
-        src="/animations/big-octopus.json"
+        src="/animations/Main Scene.json"
         style={{ 
           width: '100%', 
           height: '100%',
-          filter: 'contrast(2) brightness(1.4) saturate(2.5)' // Enhanced colors for bold look
+          // filter: 'contrast(2) brightness(1.4) saturate(2.5)' // Enhanced colors for bold look
         }}
       />
       
       {/* Additional Japanese-style ink splash behind octopus */}
-      <div className="absolute inset-0 -z-10 overflow-hidden opacity-30">
+      {/* <div className="absolute inset-0 -z-10 overflow-hidden opacity-30">
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <path d="M30,50 C30,30 70,30 70,50 C70,70 30,70 30,50 Z" fill="#000" />
           <path d="M45,20 C45,10 55,10 55,20 C55,30 45,30 45,20 Z" fill="#000" />
@@ -130,7 +131,7 @@ export default function AnimatedOctopus({
           <path d="M20,45 C10,45 10,55 20,55 C30,55 30,45 20,45 Z" fill="#000" />
           <path d="M80,45 C70,45 70,55 80,55 C90,55 90,45 80,45 Z" fill="#000" />
         </svg>
-      </div>
+      </div> */}
     </div>
   )
 } 

@@ -554,8 +554,9 @@ export default function Home() {
         {/* Animated Octopus with better visibility */}
         <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 20 }}>
           {/* Enhanced wave pattern with Hokusai style */}
-          {/* <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.1} /> */}
-          
+          {/* <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
+          <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} />
+          <AnimatedOctopus position="right" size="small" delay={0.8} />
           {/* Add bubbles for underwater effect */}
           <Bubbles count={50} />
           
@@ -563,8 +564,9 @@ export default function Home() {
           {/* <AnimatedOctopus position="left" size="large" delay={0.5} />
           <AnimatedOctopus position="right" size="medium" delay={1.2} />
           <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
-          <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} />
-          <JapaneseWaves position="bottom" color="navy" zIndex={12} opacity={0.5} />
+          {/* <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
+          {/* <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} /> */}
+          {/* <JapaneseWaves position="bottom" color="navy" zIndex={12} opacity={0.5} /> */}
         </div>
       </div>
       
