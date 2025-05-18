@@ -120,6 +120,67 @@ function TakoyakiModel({ index = 0, delay = 0 }: TakoyakiModelProps) {
   )
 }
 
+// Ocean Wave Animation Component
+function OceanWaves() {
+  const oceanRef = useRef<HTMLDivElement>(null)
+  const [splashes, setSplashes] = useState<Array<{id: number, x: number, y: number}>>([])
+  const nextIdRef = useRef(0)
+  
+  const createSplash = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!oceanRef.current) return
+    
+    const rect = oceanRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    
+    const newSplash = {
+      id: nextIdRef.current++,
+      x,
+      y
+    }
+    
+    setSplashes(prev => [...prev, newSplash])
+    
+    // Remove splash after animation completes
+    setTimeout(() => {
+      setSplashes(prev => prev.filter(splash => splash.id !== newSplash.id))
+    }, 600)
+  }
+  
+  return (
+    <div 
+      ref={oceanRef} 
+      className="ocean relative" 
+      onClick={createSplash}
+      style={{ overflow: 'hidden', height: '400px' }}
+    >
+      <div className="absolute inset-0 w-[120%] ml-[-10%] mb-[-100px] overflow-hidden">
+        <iframe 
+          src="/video-player.html" 
+          className="w-full h-[500px]" 
+          style={{ 
+            border: 'none',
+            pointerEvents: 'none'
+          }}
+        />
+      </div>
+      
+      {/* Render splashes */}
+      {splashes.map(splash => (
+        <div 
+          key={splash.id}
+          className="splash"
+          style={{
+            left: `${splash.x}px`,
+            top: `${splash.y}px`,
+            zIndex: 10
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 // Enhanced Ocean Floor Component
 function OceanFloorWave() {
   return (
@@ -186,73 +247,19 @@ function OceanFloorWave() {
           opacity: 0.6
         }}
       >
-        <Player
-          autoplay
-          loop
-          src="/animations/wave.json"
-          style={{ 
-            width: '100%', 
-            height: '100%',
-            filter: 'blur(2px) brightness(1.2)'
-          }}
-        />
+        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+          <iframe 
+            src="/video-player.html" 
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              border: 'none',
+              filter: 'blur(2px) brightness(1.2)'
+            }}
+          />
+        </div>
       </Html>
     </group>
-  )
-}
-
-// Ocean Wave Animation Component
-function OceanWaves() {
-  const oceanRef = useRef<HTMLDivElement>(null)
-  const [splashes, setSplashes] = useState<Array<{id: number, x: number, y: number}>>([])
-  const nextIdRef = useRef(0)
-  
-  const createSplash = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!oceanRef.current) return
-    
-    const rect = oceanRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    
-    const newSplash = {
-      id: nextIdRef.current++,
-      x,
-      y
-    }
-    
-    setSplashes(prev => [...prev, newSplash])
-    
-    // Remove splash after animation completes
-    setTimeout(() => {
-      setSplashes(prev => prev.filter(splash => splash.id !== newSplash.id))
-    }, 600)
-  }
-  
-  return (
-    <div 
-      ref={oceanRef} 
-      className="ocean" 
-      onClick={createSplash}
-    >
-      <Player
-        autoplay
-        loop
-        src="/animations/wave.json"
-        style={{ width: '120%', height: '400px', marginLeft: '-10%', marginBottom: '-100px' }}
-      />
-      
-      {/* Render splashes */}
-      {splashes.map(splash => (
-        <div 
-          key={splash.id}
-          className="splash"
-          style={{
-            left: `${splash.x}px`,
-            top: `${splash.y}px`
-          }}
-        />
-      ))}
-    </div>
   )
 }
 
@@ -541,40 +548,53 @@ export default function Home() {
     
       {/* All Japanese style ocean background elements - only visible in hero section */}
       <div ref={oceanContainerRef} className="hide-on-scroll">
+        {/* Ocean video background */}
+        <div className="fixed inset-0 overflow-hidden" style={{ zIndex: 1 }}>
+          <div className="absolute inset-0 bg-blue-800 bg-gradient-to-b from-blue-800 via-blue-500 to-sky-300"></div>
+          
+          {/* Direct video element with fallback waves */}
+          <div className="responsive-video-container">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <source src="/video/octopus_ocean.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      
         {/* Japanese ocean background */}
-        <JapaneseOcean style="traditional" />
+        {/* <JapaneseOcean style="traditional" /> */}
         
         {/* Add traditional whirlpool patterns */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 4 }}>
+        {/* <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 4 }}>
           <div className="traditional-whirlpool absolute top-1/4 left-1/3" style={{ animationDuration: "25s" }}></div>
           <div className="traditional-whirlpool absolute bottom-1/3 right-1/4" style={{ animationDuration: "20s" }}></div>
           <div className="traditional-whirlpool absolute top-2/3 left-1/4 w-32 h-32" style={{ animationDuration: "15s" }}></div>
-        </div>
+        </div> */}
         
         {/* Animated Octopus with better visibility */}
-        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 20 }}>
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 40 }}>
           {/* Enhanced wave pattern with Hokusai style */}
-          {/* <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
-          <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} />
-          <AnimatedOctopus position="right" size="small" delay={0.8} />
-          {/* Add bubbles for underwater effect */}
-          <Bubbles count={50} />
+          {/* <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} /> */}
           
-          {/* Animated octopus characters */}
+          {/* Add more octopuses for better visibility */}
           {/* <AnimatedOctopus position="left" size="large" delay={0.5} />
           <AnimatedOctopus position="right" size="medium" delay={1.2} />
           <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
-          {/* <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
-          {/* <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} /> */}
-          {/* <JapaneseWaves position="bottom" color="navy" zIndex={12} opacity={0.5} /> */}
+          
+          {/* Add bubbles for underwater effect */}
+          {/* <Bubbles count={50} /> */}
         </div>
       </div>
       
       {/* Decorative frame */}
-      <JapaneseFrame />
+      {/* <JapaneseFrame /> */}
       
       {/* Navigation */}
-      <Navigation />
+      {/* <Navigation /> */}
       
       {/* Hero section with enhanced ocean */}
       <div 
@@ -582,7 +602,7 @@ export default function Home() {
         className="w-screen h-screen relative overflow-hidden"
       >
         {/* Floating lanterns in background */}
-        <div className="absolute top-[15%] left-[10%] z-5 float-character" style={{ animationDelay: "0.5s" }}>
+        {/* <div className="absolute top-[15%] left-[10%] z-5 float-character" style={{ animationDelay: "0.5s" }}>
           <div className="w-16 h-24 relative">
             <div className="w-full h-3 bg-amber-800 rounded-t-full"></div>
             <div className="w-full h-16 bg-red-600 rounded-lg relative overflow-hidden">
@@ -594,9 +614,9 @@ export default function Home() {
             <div className="w-full h-3 bg-amber-800 rounded-b-full"></div>
             <div className="w-0.5 h-8 bg-amber-900 mx-auto"></div>
           </div>
-        </div>
+        </div> */}
         
-        <div className="absolute top-[8%] right-[20%] z-5 float-character" style={{ animationDelay: "1.2s" }}>
+        {/* <div className="absolute top-[8%] right-[20%] z-5 float-character" style={{ animationDelay: "1.2s" }}>
           <div className="w-14 h-20 relative">
             <div className="w-full h-3 bg-amber-800 rounded-t-full"></div>
             <div className="w-full h-14 bg-red-600 rounded-lg relative overflow-hidden">
@@ -608,8 +628,8 @@ export default function Home() {
             <div className="w-full h-3 bg-amber-800 rounded-b-full"></div>
             <div className="w-0.5 h-7 bg-amber-900 mx-auto"></div>
           </div>
-        </div>
-
+        </div> */}
+        
         {/* 3D Scene with simplified ocean floor */}
         {/* <div className="absolute inset-0">
           <Canvas 
@@ -678,17 +698,17 @@ export default function Home() {
         </div> */}
         
         {/* Enhanced underwater bubbles effects - Only in hero section */}
-        <Bubbles count={40} />
+        {/* <Bubbles count={40} /> */}
         
         {/* Light rays effect for underwater ambiance */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+        {/* <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
           <div className="underwater-rays w-full h-full"></div>
           <div className="underwater-rays w-full h-full" style={{ animationDelay: "2s" }}></div>
           <div className="underwater-rays w-full h-full" style={{ animationDelay: "4s" }}></div>
-        </div>
+        </div> */}
         
         {/* Text appearing from sauce */}
-        <SoySauceText />
+        {/* <SoySauceText /> */}
         
         {/* Stamp/seal element */}
         <div className="absolute top-16 right-16 w-24 h-24 bg-red-600 rounded-full flex items-center justify-center rotate-12 shadow-lg border-2 border-amber-500 z-30">
@@ -748,7 +768,6 @@ export default function Home() {
           </Link>
         </div>
       </div>
-      
       {/* Contact section */}
       <div className="bg-blue-900 py-16 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -816,6 +835,47 @@ export default function Home() {
           <p>© 2024 マスタータコ - Markham&apos;s 本格的なたこ焼き</p>
         </div>
       </div>
+      
+      {/* Add CSS for wave animations */}
+      <style jsx global>{`
+        .css-wave {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 100px;
+          background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' fill='%23ffffff' opacity='0.25'/%3E%3C/svg%3E");
+          background-size: 1200px 100px;
+          animation: wave-animation 15s linear infinite;
+        }
+        
+        .wave1 {
+          bottom: 0;
+          opacity: 0.5;
+          animation: wave-animation 20s linear infinite;
+        }
+        
+        .wave2 {
+          bottom: 10px;
+          opacity: 0.7;
+          animation: wave-animation 18s linear infinite reverse;
+        }
+        
+        .wave3 {
+          bottom: 20px;
+          opacity: 0.3;
+          animation: wave-animation 15s linear infinite;
+        }
+        
+        @keyframes wave-animation {
+          0% {
+            background-position-x: 0;
+          }
+          100% {
+            background-position-x: 1200px;
+          }
+        }
+      `}</style>
     </div>
   )
 }

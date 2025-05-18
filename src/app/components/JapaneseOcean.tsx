@@ -17,6 +17,7 @@ interface JapaneseOceanProps {
 export default function JapaneseOcean({ style = 'traditional' }: JapaneseOceanProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const waveRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const bgRef = useRef<HTMLDivElement>(null)
   
   useEffect(() => {
@@ -29,14 +30,16 @@ export default function JapaneseOcean({ style = 'traditional' }: JapaneseOceanPr
       ease: 'power2.out'
     })
     
-    // Wave animation
-    gsap.to(waveRef.current, {
-      y: '+=15',
-      duration: 8,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    })
+    // Wave animation (only for non-video version)
+    if (!videoRef.current) {
+      gsap.to(waveRef.current, {
+        y: '+=15',
+        duration: 8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
+    }
     
     // Background shimmer effect
     if (bgRef.current) {
@@ -50,7 +53,7 @@ export default function JapaneseOcean({ style = 'traditional' }: JapaneseOceanPr
     
     return () => {
       gsap.killTweensOf(containerRef.current)
-      gsap.killTweensOf(waveRef.current)
+      if (!videoRef.current) gsap.killTweensOf(waveRef.current)
       if (bgRef.current) gsap.killTweensOf(bgRef.current)
     }
   }, [])
@@ -195,23 +198,20 @@ export default function JapaneseOcean({ style = 'traditional' }: JapaneseOceanPr
           {/* Light rays effect */}
           <div className="absolute inset-0 underwater-rays opacity-70" style={{ zIndex: 2 }}></div>
           
-          {/* Lottie animation waves for other styles */}
+          {/* Video ocean waves instead of Lottie animation */}
           <div
             ref={waveRef}
-            className="absolute left-0 right-0 bottom-0 pointer-events-none"
+            className="absolute left-0 right-0 bottom-0 pointer-events-none overflow-hidden"
             style={{ zIndex: 3 }}
           >
-            <Player
-              autoplay
-              loop
-              src={currentStyle.waves}
+            <iframe
+              src="/video-player.html"
+              className="w-[120%] h-[400px] ml-[-10%]"
               style={{ 
-                width: '120%', 
-                height: '400px', 
-                marginLeft: '-10%',
+                border: 'none',
                 opacity: 0.85
               }}
-            />
+            ></iframe>
           </div>
           
           {/* Add Japanese-style foam patterns at the top of waves */}
