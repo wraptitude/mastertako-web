@@ -3,12 +3,17 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame, } from '@react-three/fiber'
-import { useGLTF, Environment } from '@react-three/drei'
+import { useGLTF, Environment, Html } from '@react-three/drei'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import AnimatedOctopus from './components/AnimatedOctopus'
+import JapaneseWaves from './components/JapaneseWaves'
+import Bubbles from './components/Bubbles'
+import JapaneseFrame from './components/JapaneseFrame'
+import JapaneseOcean from './components/JapaneseOcean'
 
 // Dynamically import the Player component with SSR disabled
 const Player = dynamic(
@@ -115,6 +120,142 @@ function TakoyakiModel({ index = 0, delay = 0 }: TakoyakiModelProps) {
   )
 }
 
+// Enhanced Ocean Floor Component
+function OceanFloorWave() {
+  return (
+    <group position={[0, -3, 0]}>
+      {/* Beautiful ocean floor with gradient */}
+      <mesh 
+        rotation={[-Math.PI / 2, 0, 0]} 
+        receiveShadow
+      >
+        <planeGeometry args={[120, 120]} />
+        <meshStandardMaterial 
+          color="#0d9488" 
+          metalness={0.4}
+          roughness={0.6}
+          transparent
+          opacity={0.8}
+        />
+      </mesh>
+      
+      {/* Subtle seaweed elements */}
+      {Array.from({ length: 12 }).map((_, index) => {
+        const x = (Math.random() - 0.5) * 40;
+        const z = (Math.random() - 0.5) * 40;
+        const height = 2 + Math.random() * 3;
+        const swaySpeed = 0.2 + Math.random() * 0.3;
+        const swayAmount = 0.2 + Math.random() * 0.3;
+        
+        return (
+          <group key={index} position={[x, 0, z]}>
+            <mesh rotation={[0, Math.random() * Math.PI, Math.sin(Date.now() * 0.001 * swaySpeed) * swayAmount]} scale={[0.3, height, 0.3]}>
+              <cylinderGeometry args={[0.1, 0.3, 1, 8]} />
+              <meshStandardMaterial color={index % 2 === 0 ? "#047857" : "#0f766e"} roughness={0.7} />
+            </mesh>
+          </group>
+        );
+      })}
+      
+      {/* Coral elements */}
+      {Array.from({ length: 8 }).map((_, index) => {
+        const x = (Math.random() - 0.5) * 30;
+        const z = (Math.random() - 0.5) * 30;
+        const scale = 0.5 + Math.random() * 0.8;
+        
+        return (
+          <group key={`coral-${index}`} position={[x, 0, z]}>
+            <mesh rotation={[0.1, Math.random() * Math.PI, 0.1]} scale={[scale, scale * 0.8, scale]}>
+              <sphereGeometry args={[1, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              <meshStandardMaterial color={index % 3 === 0 ? "#f97316" : index % 3 === 1 ? "#ef4444" : "#ec4899"} roughness={0.8} />
+            </mesh>
+          </group>
+        );
+      })}
+      
+      {/* Underwater wave effect */}
+      <Html
+        transform
+        distanceFactor={20}
+        position={[0, 0.5, 0]}
+        style={{
+          width: '120vw',
+          height: '50vh',
+          pointerEvents: 'none',
+          transform: 'translateY(15%) translateX(-8%)',
+          opacity: 0.6
+        }}
+      >
+        <Player
+          autoplay
+          loop
+          src="/animations/wave.json"
+          style={{ 
+            width: '100%', 
+            height: '100%',
+            filter: 'blur(2px) brightness(1.2)'
+          }}
+        />
+      </Html>
+    </group>
+  )
+}
+
+// Ocean Wave Animation Component
+function OceanWaves() {
+  const oceanRef = useRef<HTMLDivElement>(null)
+  const [splashes, setSplashes] = useState<Array<{id: number, x: number, y: number}>>([])
+  const nextIdRef = useRef(0)
+  
+  const createSplash = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!oceanRef.current) return
+    
+    const rect = oceanRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    
+    const newSplash = {
+      id: nextIdRef.current++,
+      x,
+      y
+    }
+    
+    setSplashes(prev => [...prev, newSplash])
+    
+    // Remove splash after animation completes
+    setTimeout(() => {
+      setSplashes(prev => prev.filter(splash => splash.id !== newSplash.id))
+    }, 600)
+  }
+  
+  return (
+    <div 
+      ref={oceanRef} 
+      className="ocean" 
+      onClick={createSplash}
+    >
+      <Player
+        autoplay
+        loop
+        src="/animations/wave.json"
+        style={{ width: '120%', height: '400px', marginLeft: '-10%', marginBottom: '-100px' }}
+      />
+      
+      {/* Render splashes */}
+      {splashes.map(splash => (
+        <div 
+          key={splash.id}
+          className="splash"
+          style={{
+            left: `${splash.x}px`,
+            top: `${splash.y}px`
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 // 醬汁文字動畫效果
 function SoySauceText() {
   const textRef = useRef<HTMLDivElement>(null)
@@ -173,10 +314,10 @@ function SoySauceText() {
   return (
     <div 
       ref={textRef} 
-      className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-7xl font-bold text-white"
+      className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-7xl font-bold text-white shake-text"
       style={{ willChange: 'transform' }} // 提示瀏覽器優化渲染
     >
-      {/* {["マ", "ス", "タ", "ー", " ", "タ", "コ"].map((letter, i) => (
+      {["マ", "ス", "タ", "ー", " ", "タ", "コ"].map((letter, i) => (
         <span 
           key={i} 
           className="sauce-letter inline-block relative"
@@ -188,12 +329,12 @@ function SoySauceText() {
             style={{ willChange: 'height, opacity' }} // 提示瀏覽器優化渲染
           ></div>
         </span>
-      ))} */}
+      ))}
     </div>
   )
 }
 
-// Japanese style background pattern component
+// Japanese pattern background component
 function JapanesePattern() {
   return (
     <div className="absolute inset-0 japanese-pattern pointer-events-none"></div>
@@ -301,7 +442,7 @@ function MenuItem({ name, image, description, index }: MenuItemProps) {
             className="w-full h-full object-cover rounded-full shadow-lg border-4 border-amber-500"
           />
           <div className="absolute -bottom-2 -right-2 bg-white text-red-600 font-bold text-lg rounded-full w-14 h-14 flex items-center justify-center border-2 border-red-600 rotate-12">
-            人気
+            人氣
           </div>
         </div>
       </div>
@@ -320,6 +461,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null)
   const splashRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const oceanContainerRef = useRef<HTMLDivElement>(null) // Reference for ocean container
   
   // Menu items data
   const menuItems: MenuItem[] = [
@@ -341,13 +483,9 @@ export default function Home() {
   ]
   
   useEffect(() => {
-    // Set intro as complete after animation finishes
-    // const timer = setTimeout(() => {
-    //   setIsIntroComplete(true)
-    // }, 4000)
-    
     // Set up scroll animations
-    if (menuRef.current) {
+    if (menuRef.current && oceanContainerRef.current) {
+      // Fade in menu section
       gsap.fromTo(
         menuRef.current,
         { opacity: 0 },
@@ -361,109 +499,208 @@ export default function Home() {
           }
         }
       )
+      
+      // Hide ocean when scrolling down with enhanced transition
+      gsap.to(oceanContainerRef.current, {
+        opacity: 0,
+        y: -50,
+        ease: "power2.inOut",
+        scrollTrigger: {
+          trigger: menuRef.current,
+          start: "top 95%", // Start hiding when menu section is near viewport
+          end: "top 75%",
+          scrub: 1.5 // Smoother transition with a slight delay
+        }
+      })
+      
+      // Add class to body when scrolled
+      const handleScroll = () => {
+        // Add or remove class based on scroll position (when scrolling past 100vh)
+        if (window.scrollY > window.innerHeight * 0.5) {
+          document.body.classList.add('is-scrolled')
+        } else {
+          document.body.classList.remove('is-scrolled')
+        }
+      }
+      
+      // Initial check
+      handleScroll()
+      
+      // Add event listener
+      window.addEventListener('scroll', handleScroll)
+      
+      // Clean up
+      return () => {
+        window.removeEventListener('scroll', handleScroll)
+      }
     }
-    
-    // return () => clearTimeout(timer)
   }, [])
   
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-orange-900 to-orange-700 overflow-x-hidden">
-      {/* Background pattern */}
-      <JapanesePattern />
+    <div className="w-full min-h-screen overflow-x-hidden">
+    
+      {/* All Japanese style ocean background elements - only visible in hero section */}
+      <div ref={oceanContainerRef} className="hide-on-scroll">
+        {/* Japanese ocean background */}
+        <JapaneseOcean style="traditional" />
+        
+        {/* Add traditional whirlpool patterns */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 4 }}>
+          <div className="traditional-whirlpool absolute top-1/4 left-1/3" style={{ animationDuration: "25s" }}></div>
+          <div className="traditional-whirlpool absolute bottom-1/3 right-1/4" style={{ animationDuration: "20s" }}></div>
+          <div className="traditional-whirlpool absolute top-2/3 left-1/4 w-32 h-32" style={{ animationDuration: "15s" }}></div>
+        </div>
+        
+        {/* Animated Octopus with better visibility */}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 20 }}>
+          {/* Enhanced wave pattern with Hokusai style */}
+          {/* <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.1} /> */}
+          
+          {/* Add bubbles for underwater effect */}
+          <Bubbles count={50} />
+          
+          {/* Animated octopus characters */}
+          {/* <AnimatedOctopus position="left" size="large" delay={0.5} />
+          <AnimatedOctopus position="right" size="medium" delay={1.2} />
+          <AnimatedOctopus position="center" size="small" delay={0.8} /> */}
+          <JapaneseWaves position="bottom" color="hokusai" zIndex={15} opacity={0.9} />
+          <JapaneseWaves position="bottom" color="navy" zIndex={12} opacity={0.5} />
+        </div>
+      </div>
+      
+      {/* Decorative frame */}
+      <JapaneseFrame />
       
       {/* Navigation */}
       <Navigation />
       
-      {/* Decorative lanterns */}
-      <JapaneseLantern position="left" />
-      <JapaneseLantern position="right" />
-      
-      {/* Hero section with 3D models */}
+      {/* Hero section with enhanced ocean */}
       <div 
         ref={containerRef}
         className="w-screen h-screen relative overflow-hidden"
       >
-        {/* Traditional Japanese wave pattern at bottom */}
-        <div className="absolute bottom-0 left-0 w-full h-16 z-10 pointer-events-none">
-          <svg preserveAspectRatio="none" viewBox="0 0 1200 120" className="w-full h-full text-orange-600 fill-current opacity-70">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z">
-            </path>
-          </svg>
+        {/* Floating lanterns in background */}
+        <div className="absolute top-[15%] left-[10%] z-5 float-character" style={{ animationDelay: "0.5s" }}>
+          <div className="w-16 h-24 relative">
+            <div className="w-full h-3 bg-amber-800 rounded-t-full"></div>
+            <div className="w-full h-16 bg-red-600 rounded-lg relative overflow-hidden">
+              <div className="absolute inset-0 opacity-30 bg-repeat" style={{ 
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E\")" 
+              }}></div>
+              <div className="flex justify-center items-center h-full text-white font-bold">福</div>
+            </div>
+            <div className="w-full h-3 bg-amber-800 rounded-b-full"></div>
+            <div className="w-0.5 h-8 bg-amber-900 mx-auto"></div>
+          </div>
         </div>
         
-        {/* 3D Scene */}
-        <div className="absolute inset-0">
+        <div className="absolute top-[8%] right-[20%] z-5 float-character" style={{ animationDelay: "1.2s" }}>
+          <div className="w-14 h-20 relative">
+            <div className="w-full h-3 bg-amber-800 rounded-t-full"></div>
+            <div className="w-full h-14 bg-red-600 rounded-lg relative overflow-hidden">
+              <div className="absolute inset-0 opacity-30 bg-repeat" style={{ 
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E\")" 
+              }}></div>
+              <div className="flex justify-center items-center h-full text-white font-bold">海</div>
+            </div>
+            <div className="w-full h-3 bg-amber-800 rounded-b-full"></div>
+            <div className="w-0.5 h-7 bg-amber-900 mx-auto"></div>
+          </div>
+        </div>
+
+        {/* 3D Scene with simplified ocean floor */}
+        {/* <div className="absolute inset-0">
           <Canvas 
             camera={{ position: [0, 2, 12], fov: 65 }} 
             shadows
+            gl={{ antialias: true, alpha: true }}
+            dpr={[1, 2]}
           >
-            {/* Improved lighting setup */}
-            <ambientLight intensity={0.6} />
+            <ambientLight intensity={0.4} color="#a5f3fc" />
             <directionalLight 
               position={[10, 10, 5]} 
-              intensity={2}
+              intensity={1.5}
+              color="#0ea5e9"
               castShadow
-              shadow-mapSize={[1024, 1024]}
+              shadow-mapSize={[2048, 2048]}
             />
             <directionalLight 
-              position={[-5, 5, -5]} 
-              intensity={0.5} 
-              color="#5b88ff"
+              position={[-5, 8, -5]} 
+              intensity={1} 
+              color="#a5f3fc"
             />
-            <Environment preset="sunset" />
+            <spotLight
+              position={[0, 15, 0]}
+              angle={0.3}
+              penumbra={0.8}
+              intensity={2}
+              color="#38bdf8"
+              castShadow
+            />
+            <fog attach="fog" args={['#164e63', 10, 50]} />
+            <Environment preset="night" />
             
-            {/* Ocean floor */}
-            <mesh 
-              rotation={[-Math.PI / 2, 0, 0]} 
-              position={[0, -3, 0]}
-              receiveShadow
-            >
-              <planeGeometry args={[100, 100]} />
-              <meshStandardMaterial 
-                color="#8B2500" 
-                metalness={0.2}
-                roughness={0.8}
-              />
-            </mesh>
-            
-            {/* Multiple Takoyaki models jumping out */}
-            {[0, 1, 2, 3, 4, 5].map((index) => (
-              <TakoyakiModel key={index} index={index} delay={1} />
-            ))}
-
+            <group position={[0, -3, 0]}>
+              <mesh 
+                rotation={[-Math.PI / 2, 0, 0]} 
+                receiveShadow
+              >
+                <planeGeometry args={[120, 120]} />
+                <meshStandardMaterial 
+                  color="#0d9488" 
+                  metalness={0.4}
+                  roughness={0.6}
+                  transparent
+                  opacity={0.8}
+                />
+              </mesh>
+              
+              {Array.from({ length: 6 }).map((_, index) => {
+                const x = (Math.random() - 0.5) * 40;
+                const z = (Math.random() - 0.5) * 40;
+                const height = 2 + Math.random() * 3;
+                const swaySpeed = 0.2 + Math.random() * 0.3;
+                const swayAmount = 0.2 + Math.random() * 0.3;
+                
+                return (
+                  <group key={index} position={[x, 0, z]}>
+                    <mesh rotation={[0, Math.random() * Math.PI, Math.sin(Date.now() * 0.001 * swaySpeed) * swayAmount]} scale={[0.3, height, 0.3]}>
+                      <cylinderGeometry args={[0.1, 0.3, 1, 8]} />
+                      <meshStandardMaterial color={index % 2 === 0 ? "#047857" : "#0f766e"} roughness={0.7} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
           </Canvas>
-        </div>
+        </div> */}
         
-        {/* Water splash animation */}
-        <div 
-          ref={splashRef} 
-          className="absolute bottom-0 left-0 w-full h-64 pointer-events-none"
-        >
-          <Player
-            autoplay
-            loop
-            src="/animations/splash.json"
-            style={{ width: '100%', height: '100%' }}
-          />
-          
+        {/* Enhanced underwater bubbles effects - Only in hero section */}
+        <Bubbles count={40} />
+        
+        {/* Light rays effect for underwater ambiance */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+          <div className="underwater-rays w-full h-full"></div>
+          <div className="underwater-rays w-full h-full" style={{ animationDelay: "2s" }}></div>
+          <div className="underwater-rays w-full h-full" style={{ animationDelay: "4s" }}></div>
         </div>
         
         {/* Text appearing from sauce */}
         <SoySauceText />
         
         {/* Stamp/seal element */}
-        <div className="absolute top-16 right-16 w-24 h-24 bg-red-600 rounded-full flex items-center justify-center rotate-12 shadow-lg border-2 border-amber-500">
+        <div className="absolute top-16 right-16 w-24 h-24 bg-red-600 rounded-full flex items-center justify-center rotate-12 shadow-lg border-2 border-amber-500 z-30">
           <div className="text-white font-bold text-center leading-tight">
             <div className="text-xs">本物の</div>
             <div className="text-xl">味</div>
           </div>
         </div>
         
-        {/* Scroll indicator */}
+        {/* Scroll indicator with enhanced animation */}
         <motion.div 
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white text-center z-20"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white text-center z-40"
+          animate={{ y: [0, 12, 0] }}
+          transition={{ repeat: Infinity, duration: 1.2 }}
         >
           <p className="mb-2 font-medium">スクロールして探索</p>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -472,8 +709,8 @@ export default function Home() {
         </motion.div>
       </div>
       
-      {/* Menu section */}
-      <div ref={menuRef} className="container mx-auto px-4 py-20 relative">
+      {/* Menu section with solid background to cover ocean */}
+      <div ref={menuRef} className="container mx-auto px-4 py-20 relative bg-gradient-to-b from-blue-900 to-indigo-900">
         <div className="absolute left-0 top-0 w-full h-full japanese-pattern opacity-5 pointer-events-none"></div>
         
         <div className="text-center mb-16 relative">
@@ -511,7 +748,7 @@ export default function Home() {
       </div>
       
       {/* Contact section */}
-      <div className="bg-red-900 py-16 text-white relative overflow-hidden">
+      <div className="bg-blue-900 py-16 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
             <g fill="white" fillRule="evenodd">
@@ -572,7 +809,7 @@ export default function Home() {
       </div>
       
       {/* Footer with Japanese pattern */}
-      <div className="bg-orange-900 py-6 text-white">
+      <div className="bg-blue-900 py-6 text-white">
         <div className="container mx-auto px-4 text-center text-sm">
           <p>© 2024 マスタータコ - Markham&apos;s 本格的なたこ焼き</p>
         </div>
